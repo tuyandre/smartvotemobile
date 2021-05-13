@@ -29,53 +29,54 @@ import xyz.developerbab.smartvoteapp.singleton.RESTCl;
 public class LoginActivity extends AppCompatActivity {
     private TextView tv_signup;
     private Button btnLoginFarmer;
-    private EditText etphone,etpassword;
-    private String phone,password;
+    private EditText etphone, etpassword;
+    private String phone, password;
     private ImageView backlogin;
 
-    private  ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        progressDialog=new ProgressDialog(LoginActivity.this);
+        progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setMessage("Loading ...");
         progressDialog.setCanceledOnTouchOutside(false);
 
-        etpassword=findViewById(R.id.etPasswordlogin);
-        etphone=findViewById(R.id.etPhonelogin);
+        etpassword = findViewById(R.id.etPasswordlogin);
+        etphone = findViewById(R.id.etPhonelogin);
 
-        backlogin=findViewById(R.id.backlogin);
+        backlogin = findViewById(R.id.backlogin);
         backlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this,ChooseActivity.class));
+                startActivity(new Intent(LoginActivity.this, ChooseActivity.class));
             }
         });
-        btnLoginFarmer=findViewById(R.id.btnLoginFarmer);
+        btnLoginFarmer = findViewById(R.id.btnLoginFarmer);
         btnLoginFarmer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                phone=etphone.getText().toString().trim();
-                password=etpassword.getText().toString().trim();
-                if (phone.isEmpty()|| password.isEmpty()){
+                phone = etphone.getText().toString().trim();
+                password = etpassword.getText().toString().trim();
+                if (phone.isEmpty() || password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Please enter phone and password", Toast.LENGTH_LONG).show();
-                }else {
+                } else {
                     loginpop();
                 }
 
             }
         });
-        tv_signup=findViewById(R.id.tv_signup);
+        tv_signup = findViewById(R.id.tv_signup);
         tv_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this,ChooseActivity.class));
+                startActivity(new Intent(LoginActivity.this, ChooseActivity.class));
             }
         });
     }
+
     // create API
     public void loginpop() {
 
@@ -117,13 +118,14 @@ public class LoginActivity extends AppCompatActivity {
                             String emai = data.getString("email");
                             String status = data.getString("status");
                             String level = data.getString("level");
-                            String biometric=data.getString("biometric");
-                            String email=data.getString("email");
-                            String nid=data.getString("nid");
+                            String biometric = data.getString("biometric");
+                            String email = data.getString("email");
+                            String nid = data.getString("nid");
+                            String provinceid = data.getString("province_id");
+                            String district_id = data.getString("district_id");
 
-
-                          //     Toast.makeText(LoginActivity.this, "Successfully loged in " +
-                             //         id + "\n" + names + "\n" + fone + "\n" + emai + "\n" + level+biometric+nid, Toast.LENGTH_LONG).show();
+                            //     Toast.makeText(LoginActivity.this, "Successfully loged in " +
+                            //         id + "\n" + names + "\n" + fone + "\n" + emai + "\n" + level+biometric+nid, Toast.LENGTH_LONG).show();
 
                             Intent intent = new Intent(LoginActivity.this, VotingMain2Activit.class);
                             intent.putExtra("names", names);
@@ -131,11 +133,16 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("level", level);
                             intent.putExtra("status", status);
                             intent.putExtra("user", id);
-                            intent.putExtra("email",email);
-                            intent.putExtra("biometric",biometric);
-                            intent.putExtra("nid",nid);
+                            intent.putExtra("email", email);
+                            intent.putExtra("biometric", biometric);
+                            intent.putExtra("nid", nid);
+                            intent.putExtra("province",provinceid);
+                            intent.putExtra("district",district_id);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                             finish();
+
+
 
 
                         } else {
@@ -170,8 +177,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
 }

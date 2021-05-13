@@ -33,7 +33,7 @@ import xyz.developerbab.smartvoteapp.singleton.RESTApiClient;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView tvnames, tvphone, tvsex, tvdob, tvnid;
-    private String nidentered, name, phone, sex, dob, nid, checkcontinue, province_id, district_id, id, profile, biometric, email, password;
+    private String voting_id,nidentered, name, phone, sex, dob, nid, checkcontinue, province_id, district_id, id, profile, biometric, email, password;
     private EditText etnidcheck, etemail, etpassword;
     private Button btncontinuecheck, btnnexttobio;
     private ProgressDialog progressDialog;
@@ -104,20 +104,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (email.isEmpty() || password.isEmpty()) {
                         Toast.makeText(this, "Please enter your password, required", Toast.LENGTH_SHORT).show();
                     } else {
-                        Intent intent = new Intent(MainActivity.this, BiometricActivity.class);
-                        intent.putExtra("name", name);
-                        intent.putExtra("phone", phone);
-                        intent.putExtra("sex", sex);
-                        intent.putExtra("dob", dob);
-                        intent.putExtra("nid", nid);
-                        intent.putExtra("province_id", province_id);
-                        intent.putExtra("district_id", district_id);
-                        intent.putExtra("id", id);
-                        intent.putExtra("profile", profile);
-                        intent.putExtra("biometric", biometric);
-                        intent.putExtra("email", email);
-                        intent.putExtra("password", password);
-                        startActivity(intent);
+                        if (etemail.getText().toString().equals(voting_id)) {
+
+                            Intent intent = new Intent(MainActivity.this, BiometricActivity.class);
+                            intent.putExtra("name", name);
+                            intent.putExtra("phone", phone);
+                            intent.putExtra("sex", sex);
+                            intent.putExtra("dob", dob);
+                            intent.putExtra("nid", nid);
+                            intent.putExtra("province_id", province_id);
+                            intent.putExtra("district_id", district_id);
+                            intent.putExtra("id", id);
+                            intent.putExtra("profile", profile);
+                            intent.putExtra("biometric", biometric);
+                            intent.putExtra("email", voting_id);
+                            intent.putExtra("password", password);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+
+                        }
+                        else {
+                            Toast.makeText(this, "Sorry,Wrong voting ID "+"\n"+"Please consult NIDA Database Administrator for support", Toast.LENGTH_LONG).show();
+                        }
 
                     }
                 }
@@ -162,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             province_id = data.getString("province_id");
                             district_id = data.getString("district_id");
                             id = data.getString("id");
+                            voting_id=data.getString("vote_id");
                             biometric = data.getString("biometric");
                             profile = data.getString("profile");
 

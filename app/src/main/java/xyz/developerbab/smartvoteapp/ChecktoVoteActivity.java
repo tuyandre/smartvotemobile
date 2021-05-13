@@ -2,20 +2,21 @@ package xyz.developerbab.smartvoteapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.app.KeyguardManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
+import java.util.IllegalFormatCodePointException;
 import java.util.Map;
 
 import javax.crypto.Cipher;
@@ -43,44 +45,46 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import xyz.developerbab.smartvoteapp.Model.Population;
+import xyz.developerbab.smartvoteapp.Model.User;
+import xyz.developerbab.smartvoteapp.Model.Vote;
 import xyz.developerbab.smartvoteapp.singleton.RESTCl;
 
-public class BiometricActivity extends AppCompatActivity {
+public class ChecktoVoteActivity extends AppCompatActivity {
     private KeyStore keyStore;
     // Variable used for storing the key in the Android Keystore container
     private static final String KEY_NAME = "androidHive";
     private Cipher cipher;
     private TextView textView;
+    private String user, province, district, season, candidate, candidate_name,names,phone;
+    private ProgressDialog progressDialog;
 
+    private static int SPLASH_TIME_OUT = 5000;
 
-    private String name, phone, sex, dob, nid, province_id, district_id, id, profile, biometric, email, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_biometric);
+        setContentView(R.layout.activity_checkto_vote);
+        ckecktovote();
 
         Intent intent = getIntent();
-        name = intent.getStringExtra("name");
-        phone = intent.getStringExtra("phone");
-        sex = intent.getStringExtra("sex");
-        dob = intent.getStringExtra("dob");
-        nid = intent.getStringExtra("nid");
-        province_id = intent.getStringExtra("province_id");
-        district_id = intent.getStringExtra("district_id");
-        id = intent.getStringExtra("id");
-        profile = intent.getStringExtra("profile");
-        biometric = intent.getStringExtra("biometric");
-        email = intent.getStringExtra("email");
-        password = intent.getStringExtra("password");
+        names=intent.getStringExtra("names");
+        phone=intent.getStringExtra("phone");
+        user = intent.getStringExtra("user");
+        province = intent.getStringExtra("province");
+        district = intent.getStringExtra("district");
+        season = intent.getStringExtra("season");
+        candidate = intent.getStringExtra("candidate");
+        candidate_name = intent.getStringExtra("candidate_name");
 
-
-        keymanager();
+        progressDialog = new ProgressDialog(ChecktoVoteActivity.this);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Loading...");
     }
 
+
     // create API
-    public void keymanager() {
+    public void ckecktovote() {
 
         // Initializing both Android Keyguard Manager and Fingerprint Manager
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
@@ -91,8 +95,6 @@ public class BiometricActivity extends AppCompatActivity {
 
 
         textView = (TextView) findViewById(R.id.errorText);
-
-     //   textView.setText(name + "\n" + phone + "\n" + sex + "\n" + dob + "\n" + nid + "\n" + province_id + "\n" + district_id + "\n" + biometric + "\n" + email + "\n" + password);
 
 
         // Check whether the device has a Fingerprint sensor.
@@ -125,14 +127,13 @@ public class BiometricActivity extends AppCompatActivity {
                                         @Override
                                         public void onAuthenticationSucceed() {
 
-                                            registerforvoting();
-
-                                            Toast.makeText(BiometricActivity.this, "Fingerprint matched with you " + name, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(ChecktoVoteActivity.this, "Finger print is ok,Authorized " + "\n" + "Candidate names are " + candidate_name, Toast.LENGTH_LONG).show();
+                                            voteplz();
                                         }
 
                                         @Override
                                         public void onAuthenticationFail() {
-                                            Toast.makeText(BiometricActivity.this, "Sorry failed,Please This not " + name + " 's Fingerprint", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(ChecktoVoteActivity.this, "Sorry,We don't recognize your fingerprint", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                     helper.startAuth(fingerprintManager, cryptoObject);
@@ -207,59 +208,114 @@ public class BiometricActivity extends AppCompatActivity {
         }
     }
 
+    private void voteplz() {
+        progressDialog.show();
 
-    private void registerforvoting() {
         // create user body object
-        Population obj = new Population();
-        obj.setName(name);
-        obj.setPhone(phone);
-        obj.setSex(sex);
-        obj.setDob(dob);
-        obj.setNid(nid);
-        obj.setProvince(province_id);
-        obj.setDistrict(district_id);
-        obj.setBiometric(biometric);
-       // obj.setEmail(email);
+        Vote obj = new Vote();
+        obj.setUser(user);
+        obj.setProvince(province);
+        obj.setDistrict(district);
+        obj.setSeason(season);
+        obj.setCandidate(candidate);
 
         Map<String, String> param = new HashMap<>();
-        param.put("name", name);
-        param.put("phone", phone);
-        param.put("sex", sex);
-        param.put("dob", dob);
-        param.put("nid", nid);
-        param.put("province", province_id);
-        param.put("district", district_id);
-        param.put("biometric", biometric);
-        param.put("password", password);
-       // param.put("email", email);
+        param.put("user", user);
+        param.put("province", province);
+        param.put("district", district);
+        param.put("season", season);
+        param.put("candidate", candidate);
 
-        Call<ResponseBody> request = RESTCl.getInstance().getApi().registerforvote(param);
+        toraa(param);
+
+    }
+
+    private void toraa(final Map<String, String> user2) {
+        Call<ResponseBody> request = RESTCl.getInstance().getApi().vote(user2);
 
         request.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
+                //Response
+                if (response.code() == 200) {
 
-                    Toast.makeText(BiometricActivity.this, "Registered successfully ", Toast.LENGTH_LONG).show();
+                    try {
+                        String jsondata = response.body().string();
 
-                    startActivity(new Intent(BiometricActivity.this,LoginActivity.class));
-                    finish();
+                        JSONObject reader = new JSONObject(jsondata);
+                        String message = reader.getString("message");
+                        if (message.equals("voted")) {
+                            Dialog dialog = new Dialog(ChecktoVoteActivity.this);
+                            dialog.setCanceledOnTouchOutside(false);
+                            dialog.setCancelable(false);
+                            dialog.setContentView(R.layout.layout_alreadyvoted);
+                            dialog.show();
+
+                            new Handler().postDelayed(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    startActivity(new Intent(ChecktoVoteActivity.this,LoginActivity.class));
+                                    finish();
+
+                                }
+                            }, SPLASH_TIME_OUT);
+
+
+
+                        } else if (message.equals("ok")) {
+                            Dialog dialog = new Dialog(ChecktoVoteActivity.this);
+                            dialog.setCanceledOnTouchOutside(false);
+                            dialog.setCancelable(false);
+                            dialog.setContentView(R.layout.layout_chechmarkvoted);
+                            dialog.show();
+
+
+
+                            new Handler().postDelayed(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(ChecktoVoteActivity.this, VotingMain2Activit.class);
+                                    intent.putExtra("names", names);
+                                    intent.putExtra("phone", phone);
+                                    overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                                    finish();
+
+                                }
+                            }, SPLASH_TIME_OUT);
+
+
+                        }
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+
+                    }
+
+
+                    progressDialog.dismiss();
 
                 } else {
-
-                    Toast.makeText(BiometricActivity.this, "Failed to register you for this voting " + "\n" + "Response code = " + response.code(), Toast.LENGTH_LONG).show();
-
+                    progressDialog.dismiss();
+                    Toast.makeText(ChecktoVoteActivity.this, "You have voted already", Toast.LENGTH_LONG).show();
                 }
+
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                //failure
+                progressDialog.dismiss();
+                Toast.makeText(ChecktoVoteActivity.this, "Internet connection" + t.getCause(), Toast.LENGTH_LONG).show();
 
-                Toast.makeText(BiometricActivity.this, t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
-
     }
+
 
 }

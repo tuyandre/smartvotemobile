@@ -15,7 +15,7 @@ import java.util.Calendar;
 public class ChooseActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView salutation;
-    private LinearLayout laylogin,layregister;
+    private LinearLayout laylogin, layregister;
     private ImageView imgtime;
 
     private static final int TIME_INTERVAL = 3000;
@@ -26,21 +26,25 @@ public class ChooseActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose);
 
-        salutation=findViewById(R.id.salutation);
-        imgtime=findViewById(R.id.imgtime);
-        laylogin=findViewById(R.id.lay_farmer);
+        salutation = findViewById(R.id.salutation);
+        imgtime = findViewById(R.id.imgtime);
+        laylogin = findViewById(R.id.lay_farmer);
         laylogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-startActivity(new Intent(ChooseActivity.this,LoginActivity.class));
+                startActivity(new Intent(ChooseActivity.this, LoginActivity.class));
+                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                ChooseActivity.this.finish();
             }
         });
 
-        layregister=findViewById(R.id.lay_client);
+        layregister = findViewById(R.id.lay_client);
         layregister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ChooseActivity.this,MainActivity.class));
+                startActivity(new Intent(ChooseActivity.this, MainActivity.class));
+                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                ChooseActivity.this.finish();
             }
         });
 
@@ -49,7 +53,7 @@ startActivity(new Intent(ChooseActivity.this,LoginActivity.class));
     }
 
 
-    private void salutation(){
+    private void salutation() {
         // salitation
         Calendar calendar = Calendar.getInstance();
         int dayTime = calendar.get(Calendar.HOUR_OF_DAY);
@@ -79,6 +83,7 @@ startActivity(new Intent(ChooseActivity.this,LoginActivity.class));
         }
 
     }
+
     @Override
     public void onBackPressed() {
         if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {

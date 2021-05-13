@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="20dp"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/imgchechmark"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/voted_already"
+        />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:text="Sorry Already voted"
+        android:background="@drawable/mybutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#fff"
+        android:layout_below="@id/imgchechmark"
+        />
+</RelativeLayout>
